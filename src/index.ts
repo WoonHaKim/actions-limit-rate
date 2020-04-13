@@ -5,6 +5,7 @@ async function run() {
   try {
     const rate = core.getInput("rate");
     const repoToken = core.getInput("repo-token");
+    const checkInterval = parseTimeString(rate);
 
     console.log(`rate set to ${rate}`);
 
@@ -35,7 +36,7 @@ async function run() {
       new Date().getTime() - lastSuccessWorkflowDate / 1000
     );
 
-    if (interval < 600)
+    if (interval < checkInterval)
       await githubClient.actions.cancelWorkflowRun({
         ...github.context.repo,
         run_id: (github.context as any).run_id,
@@ -48,3 +49,12 @@ async function run() {
 }
 
 run();
+
+function parseTimeString(str: string) {
+  const dividers: { [key: string]: number } = { sec: 1, min: 60, hour: 3600 };
+  for (var divider in Object.keys(dividers)) {
+    if (str.includes(divider))
+      return Number(str.split(divider)[0]) * dividers[divider];
+  }
+  return 600;
+}
