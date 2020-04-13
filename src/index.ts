@@ -16,7 +16,8 @@ function parseTimeString(str: string) {
 const runAction = async () => {
   const checkInterval = parseTimeString(rate);
 
-  console.log(`rate set to ${rate}`);
+  console.log("context:", github.context);
+  console.log(`rate set to ${rate}: ${checkInterval}`);
 
   const githubClient = new github.GitHub(repoToken);
 
@@ -37,7 +38,7 @@ const runAction = async () => {
   console.log("workflowHistory:", workflowHistory);
 
   const lastSuccessWorkflow = workflowHistory.workflow_runs.find(
-    (ww) => ww.status === "success"
+    (ww) => ww.conclusion === "success"
   );
 
   console.log("lastSuccessWorkflow:", lastSuccessWorkflow);
