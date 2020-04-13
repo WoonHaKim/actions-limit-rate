@@ -3,7 +3,6 @@ import github from "@actions/github";
 
 async function run() {
   try {
-    // `who-to-greet` input defined in action metadata file
     const rate = core.getInput("rate");
     const repoToken = core.getInput("repo-token");
 
@@ -41,6 +40,8 @@ async function run() {
         ...github.context.repo,
         run_id: (github.context as any).run_id,
       });
+
+    core.setOutput("result", "rate limit passed");
   } catch (error) {
     core.setFailed(error.message);
   }

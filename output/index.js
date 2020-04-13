@@ -5,16 +5,30 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = __importDefault(require("@actions/core"));
 const github_1 = __importDefault(require("@actions/github"));
-try {
-    // `who-to-greet` input defined in action metadata file
-    const nameToGreet = core_1.default.getInput("who-to-greet");
-    console.log(`Hello ${nameToGreet}!`);
-    const time = new Date().toTimeString();
-    core_1.default.setOutput("time", time);
-    // Get the JSON webhook payload for the event that triggered the workflow
-    const payload = JSON.stringify(github_1.default.context.payload, undefined, 2);
-    console.log(`The event payload: ${payload}`);
+async function run() {
+    try {
+        const rate = core_1.default.getInput("rate");
+        const repoToken = core_1.default.getInput("repo-token");
+        console.log(`rate set to ${rate}`);
+        const githubClient = new github_1.default.GitHub(repoToken);
+        const { data: workflowLists, } = await githubClient.actions.listRepoWorkflows(github_1.default.context.repo);
+        const workingWorkflow = workflowLists.workflows.find((w) => w.name === github_1.default.context.workflow);
+        const { data: workflowHistory, } = await githubClient.actions.listWorkflowRuns({
+            ...github_1.default.context.repo,
+            workflow_id: workingWorkflow?.id,
+        });
+        const lastSuccessWorkflow = workflowHistory.workflow_runs.find((ww) => ww.status === "success");
+        const lastSuccessWorkflowDate = new Date(lastSuccessWorkflow?.created_at).getTime();
+        const interval = Math.floor(new Date().getTime() - lastSuccessWorkflowDate / 1000);
+        if (interval < 600)
+            await githubClient.actions.cancelWorkflowRun({
+                ...github_1.default.context.repo,
+                run_id: github_1.default.context.run_id,
+            });
+        core_1.default.setOutput("result", "rate limit passed");
+    }
+    catch (error) {
+        core_1.default.setFailed(error.message);
+    }
 }
-catch (error) {
-    core_1.default.setFailed(error.message);
-}
+run();
