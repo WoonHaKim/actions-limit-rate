@@ -6,7 +6,7 @@ const repoToken = core.getInput("token");
 
 function parseTimeString(str: string) {
   const dividers: { [key: string]: number } = { sec: 1, min: 60, hour: 3600 };
-  for (var divider in Object.keys(dividers)) {
+  for (var divider of Object.keys(dividers)) {
     if (str.includes(divider))
       return Number(str.split(divider)[0]) * dividers[divider];
   }
