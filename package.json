@@ -12,7 +12,8 @@
   "license": "ISC",
   "dependencies": {
     "@actions/core": "^1.2.3",
-    "@actions/github": "^2.1.1"
+    "@actions/github": "^2.1.1",
+    "source-map-support": "^0.5.16"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.27.0",

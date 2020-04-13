@@ -4178,36 +4178,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const core_1 = __importDefault(__webpack_require__(470));
-const github_1 = __importDefault(__webpack_require__(469));
-function run() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const rate = core_1.default.getInput("rate");
-            const repoToken = core_1.default.getInput("repo-token");
-            const checkInterval = parseTimeString(rate);
-            console.log(`rate set to ${rate}`);
-            const githubClient = new github_1.default.GitHub(repoToken);
-            const { data: workflowLists, } = yield githubClient.actions.listRepoWorkflows(github_1.default.context.repo);
-            const workingWorkflow = workflowLists.workflows.find((w) => w.name === github_1.default.context.workflow);
-            const { data: workflowHistory, } = yield githubClient.actions.listWorkflowRuns(Object.assign(Object.assign({}, github_1.default.context.repo), { workflow_id: workingWorkflow === null || workingWorkflow === void 0 ? void 0 : workingWorkflow.id }));
-            const lastSuccessWorkflow = workflowHistory.workflow_runs.find((ww) => ww.status === "success");
-            const lastSuccessWorkflowDate = new Date(lastSuccessWorkflow === null || lastSuccessWorkflow === void 0 ? void 0 : lastSuccessWorkflow.created_at).getTime();
-            const interval = Math.floor(new Date().getTime() - lastSuccessWorkflowDate / 1000);
-            if (interval < checkInterval)
-                yield githubClient.actions.cancelWorkflowRun(Object.assign(Object.assign({}, github_1.default.context.repo), { run_id: github_1.default.context.run_id }));
-            core_1.default.setOutput("result", "rate limit passed");
-        }
-        catch (error) {
-            core_1.default.setFailed(error.message);
-        }
-    });
-}
-run();
+const github = __importStar(__webpack_require__(469));
+const core = __importStar(__webpack_require__(470));
+const rate = core.getInput("rate");
+const repoToken = core.getInput("repo-token");
 function parseTimeString(str) {
     const dividers = { sec: 1, min: 60, hour: 3600 };
     for (var divider in Object.keys(dividers)) {
@@ -4216,7 +4198,28 @@ function parseTimeString(str) {
     }
     return 600;
 }
-
+const runAction = () => __awaiter(void 0, void 0, void 0, function* () {
+    const checkInterval = parseTimeString(rate);
+    console.log(`rate set to ${rate}`);
+    const githubClient = new github.GitHub(repoToken);
+    const { data: workflowLists } = yield githubClient.actions.listRepoWorkflows(github.context.repo);
+    const workingWorkflow = workflowLists.workflows.find((w) => w.name === github.context.workflow);
+    const { data: workflowHistory } = yield githubClient.actions.listWorkflowRuns(Object.assign(Object.assign({}, github.context.repo), { workflow_id: workingWorkflow === null || workingWorkflow === void 0 ? void 0 : workingWorkflow.id }));
+    const lastSuccessWorkflow = workflowHistory.workflow_runs.find((ww) => ww.status === "success");
+    const lastSuccessWorkflowDate = new Date(lastSuccessWorkflow === null || lastSuccessWorkflow === void 0 ? void 0 : lastSuccessWorkflow.created_at).getTime();
+    const interval = Math.floor(new Date().getTime() - lastSuccessWorkflowDate / 1000);
+    if (interval < checkInterval)
+        yield githubClient.actions.cancelWorkflowRun(Object.assign(Object.assign({}, github.context.repo), { run_id: github.context.run_id }));
+    core.setOutput("result", "rate limit passed");
+});
+try {
+    runAction();
+}
+catch (error) {
+    console.error(error);
+    core.setFailed(error.message);
+}
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyJmaWxlOi8vL1VzZXJzL3VubmFraW0vRG9jdW1lbnRzL1JlcG9zL09wZW5Tb3VyY2VzL2FjdGlvbnMtbGltaXQtcmF0ZS9zcmMvaW5kZXgudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7Ozs7O0FBQUEsd0RBQTBDO0FBQzFDLG9EQUFzQztBQUV0QyxNQUFNLElBQUksR0FBRyxJQUFJLENBQUMsUUFBUSxDQUFDLE1BQU0sQ0FBQyxDQUFDO0FBQ25DLE1BQU0sU0FBUyxHQUFHLElBQUksQ0FBQyxRQUFRLENBQUMsWUFBWSxDQUFDLENBQUM7QUFFOUMsU0FBUyxlQUFlLENBQUMsR0FBVztJQUNsQyxNQUFNLFFBQVEsR0FBOEIsRUFBRSxHQUFHLEVBQUUsQ0FBQyxFQUFFLEdBQUcsRUFBRSxFQUFFLEVBQUUsSUFBSSxFQUFFLElBQUksRUFBRSxDQUFDO0lBQzVFLEtBQUssSUFBSSxPQUFPLElBQUksTUFBTSxDQUFDLElBQUksQ0FBQyxRQUFRLENBQUMsRUFBRTtRQUN6QyxJQUFJLEdBQUcsQ0FBQyxRQUFRLENBQUMsT0FBTyxDQUFDO1lBQ3ZCLE9BQU8sTUFBTSxDQUFDLEdBQUcsQ0FBQyxLQUFLLENBQUMsT0FBTyxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUMsR0FBRyxRQUFRLENBQUMsT0FBTyxDQUFDLENBQUM7S0FDNUQ7SUFDRCxPQUFPLEdBQUcsQ0FBQztBQUNiLENBQUM7QUFFRCxNQUFNLFNBQVMsR0FBRyxHQUFTLEVBQUU7SUFDM0IsTUFBTSxhQUFhLEdBQUcsZUFBZSxDQUFDLElBQUksQ0FBQyxDQUFDO0lBRTVDLE9BQU8sQ0FBQyxHQUFHLENBQUMsZUFBZSxJQUFJLEVBQUUsQ0FBQyxDQUFDO0lBRW5DLE1BQU0sWUFBWSxHQUFHLElBQUksTUFBTSxDQUFDLE1BQU0sQ0FBQyxTQUFTLENBQUMsQ0FBQztJQUVsRCxNQUFNLEVBQUUsSUFBSSxFQUFFLGFBQWEsRUFBRSxHQUFHLE1BQU0sWUFBWSxDQUFDLE9BQU8sQ0FBQyxpQkFBaUIsQ0FDMUUsTUFBTSxDQUFDLE9BQU8sQ0FBQyxJQUFJLENBQ3BCLENBQUM7SUFDRixNQUFNLGVBQWUsR0FBRyxhQUFhLENBQUMsU0FBUyxDQUFDLElBQUksQ0FDbEQsQ0FBQyxDQUFDLEVBQUUsRUFBRSxDQUFDLENBQUMsQ0FBQyxJQUFJLEtBQUssTUFBTSxDQUFDLE9BQU8sQ0FBQyxRQUFRLENBQzFDLENBQUM7SUFFRixNQUFNLEVBQUUsSUFBSSxFQUFFLGVBQWUsRUFBRSxHQUFHLE1BQU0sWUFBWSxDQUFDLE9BQU8sQ0FBQyxnQkFBZ0IsaUNBRXRFLE1BQU0sQ0FBQyxPQUFPLENBQUMsSUFBSSxLQUN0QixXQUFXLEVBQUUsZUFBZSxhQUFmLGVBQWUsdUJBQWYsZUFBZSxDQUFFLEVBQUcsSUFFcEMsQ0FBQztJQUVGLE1BQU0sbUJBQW1CLEdBQUcsZUFBZSxDQUFDLGFBQWEsQ0FBQyxJQUFJLENBQzVELENBQUMsRUFBRSxFQUFFLEVBQUUsQ0FBQyxFQUFFLENBQUMsTUFBTSxLQUFLLFNBQVMsQ0FDaEMsQ0FBQztJQUVGLE1BQU0sdUJBQXVCLEdBQUcsSUFBSSxJQUFJLENBQ3RDLG1CQUFtQixhQUFuQixtQkFBbUIsdUJBQW5CLG1CQUFtQixDQUFFLFVBQVcsQ0FDakMsQ0FBQyxPQUFPLEVBQUUsQ0FBQztJQUNaLE1BQU0sUUFBUSxHQUFHLElBQUksQ0FBQyxLQUFLLENBQ3pCLElBQUksSUFBSSxFQUFFLENBQUMsT0FBTyxFQUFFLEdBQUcsdUJBQXVCLEdBQUcsSUFBSSxDQUN0RCxDQUFDO0lBRUYsSUFBSSxRQUFRLEdBQUcsYUFBYTtRQUMxQixNQUFNLFlBQVksQ0FBQyxPQUFPLENBQUMsaUJBQWlCLGlDQUN2QyxNQUFNLENBQUMsT0FBTyxDQUFDLElBQUksS0FDdEIsTUFBTSxFQUFHLE1BQU0sQ0FBQyxPQUFlLENBQUMsTUFBTSxJQUN0QyxDQUFDO0lBRUwsSUFBSSxDQUFDLFNBQVMsQ0FBQyxRQUFRLEVBQUUsbUJBQW1CLENBQUMsQ0FBQztBQUNoRCxDQUFDLENBQUEsQ0FBQztBQUVGLElBQUk7SUFDRixTQUFTLEVBQUUsQ0FBQztDQUNiO0FBQUMsT0FBTyxLQUFLLEVBQUU7SUFDZCxPQUFPLENBQUMsS0FBSyxDQUFDLEtBQUssQ0FBQyxDQUFDO0lBQ3JCLElBQUksQ0FBQyxTQUFTLENBQUMsS0FBSyxDQUFDLE9BQU8sQ0FBQyxDQUFDO0NBQy9CIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0ICogYXMgZ2l0aHViIGZyb20gXCJAYWN0aW9ucy9naXRodWJcIjtcbmltcG9ydCAqIGFzIGNvcmUgZnJvbSBcIkBhY3Rpb25zL2NvcmVcIjtcblxuY29uc3QgcmF0ZSA9IGNvcmUuZ2V0SW5wdXQoXCJyYXRlXCIpO1xuY29uc3QgcmVwb1Rva2VuID0gY29yZS5nZXRJbnB1dChcInJlcG8tdG9rZW5cIik7XG5cbmZ1bmN0aW9uIHBhcnNlVGltZVN0cmluZyhzdHI6IHN0cmluZykge1xuICBjb25zdCBkaXZpZGVyczogeyBba2V5OiBzdHJpbmddOiBudW1iZXIgfSA9IHsgc2VjOiAxLCBtaW46IDYwLCBob3VyOiAzNjAwIH07XG4gIGZvciAodmFyIGRpdmlkZXIgaW4gT2JqZWN0LmtleXMoZGl2aWRlcnMpKSB7XG4gICAgaWYgKHN0ci5pbmNsdWRlcyhkaXZpZGVyKSlcbiAgICAgIHJldHVybiBOdW1iZXIoc3RyLnNwbGl0KGRpdmlkZXIpWzBdKSAqIGRpdmlkZXJzW2RpdmlkZXJdO1xuICB9XG4gIHJldHVybiA2MDA7XG59XG5cbmNvbnN0IHJ1bkFjdGlvbiA9IGFzeW5jICgpID0+IHtcbiAgY29uc3QgY2hlY2tJbnRlcnZhbCA9IHBhcnNlVGltZVN0cmluZyhyYXRlKTtcblxuICBjb25zb2xlLmxvZyhgcmF0ZSBzZXQgdG8gJHtyYXRlfWApO1xuXG4gIGNvbnN0IGdpdGh1YkNsaWVudCA9IG5ldyBnaXRodWIuR2l0SHViKHJlcG9Ub2tlbik7XG5cbiAgY29uc3QgeyBkYXRhOiB3b3JrZmxvd0xpc3RzIH0gPSBhd2FpdCBnaXRodWJDbGllbnQuYWN0aW9ucy5saXN0UmVwb1dvcmtmbG93cyhcbiAgICBnaXRodWIuY29udGV4dC5yZXBvXG4gICk7XG4gIGNvbnN0IHdvcmtpbmdXb3JrZmxvdyA9IHdvcmtmbG93TGlzdHMud29ya2Zsb3dzLmZpbmQoXG4gICAgKHcpID0+IHcubmFtZSA9PT0gZ2l0aHViLmNvbnRleHQud29ya2Zsb3dcbiAgKTtcblxuICBjb25zdCB7IGRhdGE6IHdvcmtmbG93SGlzdG9yeSB9ID0gYXdhaXQgZ2l0aHViQ2xpZW50LmFjdGlvbnMubGlzdFdvcmtmbG93UnVucyhcbiAgICB7XG4gICAgICAuLi5naXRodWIuY29udGV4dC5yZXBvLFxuICAgICAgd29ya2Zsb3dfaWQ6IHdvcmtpbmdXb3JrZmxvdz8uaWQhLFxuICAgIH1cbiAgKTtcblxuICBjb25zdCBsYXN0U3VjY2Vzc1dvcmtmbG93ID0gd29ya2Zsb3dIaXN0b3J5LndvcmtmbG93X3J1bnMuZmluZChcbiAgICAod3cpID0+IHd3LnN0YXR1cyA9PT0gXCJzdWNjZXNzXCJcbiAgKTtcblxuICBjb25zdCBsYXN0U3VjY2Vzc1dvcmtmbG93RGF0ZSA9IG5ldyBEYXRlKFxuICAgIGxhc3RTdWNjZXNzV29ya2Zsb3c/LmNyZWF0ZWRfYXQhXG4gICkuZ2V0VGltZSgpO1xuICBjb25zdCBpbnRlcnZhbCA9IE1hdGguZmxvb3IoXG4gICAgbmV3IERhdGUoKS5nZXRUaW1lKCkgLSBsYXN0U3VjY2Vzc1dvcmtmbG93RGF0ZSAvIDEwMDBcbiAgKTtcblxuICBpZiAoaW50ZXJ2YWwgPCBjaGVja0ludGVydmFsKVxuICAgIGF3YWl0IGdpdGh1YkNsaWVudC5hY3Rpb25zLmNhbmNlbFdvcmtmbG93UnVuKHtcbiAgICAgIC4uLmdpdGh1Yi5jb250ZXh0LnJlcG8sXG4gICAgICBydW5faWQ6IChnaXRodWIuY29udGV4dCBhcyBhbnkpLnJ1bl9pZCxcbiAgICB9KTtcblxuICBjb3JlLnNldE91dHB1dChcInJlc3VsdFwiLCBcInJhdGUgbGltaXQgcGFzc2VkXCIpO1xufTtcblxudHJ5IHtcbiAgcnVuQWN0aW9uKCk7XG59IGNhdGNoIChlcnJvcikge1xuICBjb25zb2xlLmVycm9yKGVycm9yKTtcbiAgY29yZS5zZXRGYWlsZWQoZXJyb3IubWVzc2FnZSk7XG59XG4iXX0=
 
 /***/ }),
 
