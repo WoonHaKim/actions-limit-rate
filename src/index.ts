@@ -41,23 +41,25 @@ const runAction = async () => {
     (ww) => ww.status === "completed" && ww.conclusion === "success"
   );
 
-  console.log("lastSuccessWorkflow:", lastSuccessWorkflow);
+  if (lastSuccessWorkflow) {
+    console.log("lastSuccessWorkflow:", lastSuccessWorkflow);
 
-  const lastSuccessWorkflowDate = new Date(
-    lastSuccessWorkflow?.created_at!
-  ).getTime();
+    const lastSuccessWorkflowDate = new Date(
+      lastSuccessWorkflow?.created_at!
+    ).getTime();
 
-  const interval =
-    Math.floor(new Date().getTime() - lastSuccessWorkflowDate / 1000) ||
-    checkInterval;
+    const interval =
+      Math.floor(new Date().getTime() - lastSuccessWorkflowDate / 1000) ||
+      checkInterval;
 
-  console.log("lastSuccessWorkflowDate:", lastSuccessWorkflowDate);
+    console.log("lastSuccessWorkflowDate:", lastSuccessWorkflowDate);
 
-  if (interval < checkInterval) {
-    await githubClient.actions.cancelWorkflowRun({
-      ...github.context.repo,
-      run_id: (github.context as any).run_id,
-    });
+    if (interval < checkInterval) {
+      await githubClient.actions.cancelWorkflowRun({
+        ...github.context.repo,
+        run_id: (github.context as any).run_id,
+      });
+    }
   }
 
   core.setOutput("result", "rate limit passed");
