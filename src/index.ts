@@ -38,7 +38,7 @@ const runAction = async () => {
   console.log("workflowHistory:", workflowHistory);
 
   const lastSuccessWorkflow = workflowHistory.workflow_runs.find(
-    (ww) => ww.conclusion === "success"
+    (ww) => ww.status === "completed" && ww.conclusion === "success"
   );
 
   console.log("lastSuccessWorkflow:", lastSuccessWorkflow);
@@ -46,9 +46,10 @@ const runAction = async () => {
   const lastSuccessWorkflowDate = new Date(
     lastSuccessWorkflow?.created_at!
   ).getTime();
-  const interval = Math.floor(
-    new Date().getTime() - lastSuccessWorkflowDate / 1000
-  );
+
+  const interval =
+    Math.floor(new Date().getTime() - lastSuccessWorkflowDate / 1000) ||
+    checkInterval;
 
   console.log("lastSuccessWorkflowDate:", lastSuccessWorkflowDate);
 
