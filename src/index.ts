@@ -2,7 +2,7 @@ import * as github from "@actions/github";
 import * as core from "@actions/core";
 
 const rate = core.getInput("rate");
-const repoToken = core.getInput("repo-token");
+const repoToken = core.getInput("token");
 
 function parseTimeString(str: string) {
   const dividers: { [key: string]: number } = { sec: 1, min: 60, hour: 3600 };
