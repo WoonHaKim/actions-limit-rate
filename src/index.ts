@@ -54,7 +54,14 @@ const runAction = async () => {
 
     console.log("lastSuccessWorkflowDate:", lastSuccessWorkflowDate);
 
-    if (interval < checkInterval) {
+    const ongoingWorkflow = workflowHistory.workflow_runs.find(
+      (wr) => wr.head_sha === github.context.sha && wr.status === "in_progress"
+    );
+
+    if (
+      interval < checkInterval ||
+      lastSuccessWorkflow.head_sha === ongoingWorkflow?.head_sha
+    ) {
       await githubClient.actions.cancelWorkflowRun({
         ...github.context.repo,
         run_id: (github.context as any).run_id,
