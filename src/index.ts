@@ -42,8 +42,6 @@ const runAction = async () => {
   );
 
   if (lastSuccessWorkflow) {
-    console.log("lastSuccessWorkflow:", lastSuccessWorkflow);
-
     const lastSuccessWorkflowDate = new Date(
       lastSuccessWorkflow?.created_at!
     ).getTime();
@@ -57,6 +55,8 @@ const runAction = async () => {
     const ongoingWorkflow = workflowHistory.workflow_runs.find(
       (wr) => wr.head_sha === github.context.sha && wr.status === "in_progress"
     );
+    console.log("lastSuccessWorkflow:", lastSuccessWorkflow);
+    console.log("ongoingWorkflow:", ongoingWorkflow);
 
     if (
       interval < checkInterval ||
