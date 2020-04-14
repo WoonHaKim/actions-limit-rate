@@ -61,7 +61,7 @@ const runAction = async () => {
     if (
       interval < checkInterval ||
       (ongoingWorkflow &&
-        lastSuccessWorkflow.head_sha === ongoingWorkflow?.head_sha)
+        lastSuccessWorkflow.head_sha === github.context.sha)
     ) {
       await githubClient.actions.cancelWorkflowRun({
         ...github.context.repo,
