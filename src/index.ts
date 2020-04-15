@@ -35,11 +35,16 @@ const runAction = async () => {
     }
   );
 
-  console.log("workflowHistory:", workflowHistory);
-
+  const ongoingWorkflow = workflowHistory.workflow_runs.find(
+    (wr) => wr.head_sha === github.context.sha && wr.status === "in_progress"
+  );
+  console.log("ongoingWorkflow:", ongoingWorkflow);
   const lastSuccessWorkflow = workflowHistory.workflow_runs.find(
     (ww) => ww.status === "completed" && ww.conclusion === "success"
   );
+
+  console.log("lastSuccessWorkflow:", lastSuccessWorkflow);
+  core.setOutput("lastSuccessSha", lastSuccessWorkflow?.head_sha || "");
 
   if (lastSuccessWorkflow) {
     const lastSuccessWorkflowDate = new Date(
@@ -50,18 +55,9 @@ const runAction = async () => {
       Math.floor(new Date().getTime() - lastSuccessWorkflowDate / 1000) ||
       checkInterval;
 
-    console.log("lastSuccessWorkflowDate:", lastSuccessWorkflowDate);
-
-    const ongoingWorkflow = workflowHistory.workflow_runs.find(
-      (wr) => wr.head_sha === github.context.sha && wr.status === "in_progress"
-    );
-    console.log("lastSuccessWorkflow:", lastSuccessWorkflow);
-    console.log("ongoingWorkflow:", ongoingWorkflow);
-
     if (
       interval < checkInterval ||
-      (ongoingWorkflow &&
-        lastSuccessWorkflow.head_sha === github.context.sha)
+      (ongoingWorkflow && lastSuccessWorkflow.head_sha === github.context.sha)
     ) {
       await githubClient.actions.cancelWorkflowRun({
         ...github.context.repo,

@@ -4,7 +4,7 @@ prevents duplicated build for save billing!
 
 ## Inputs
 
-### `who-to-greet`
+### `rate`
 
 **Required** rate for limit default: `"10mins"`.
 
